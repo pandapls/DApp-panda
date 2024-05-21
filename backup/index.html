@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>钱包链接的基础demo</title>
+  </head>
+  <body>
+    <input type="button" id="wallet" value="链接钱包" />
+    <script type="text/javascript" src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="./node_modules/ethers/dist/ethers.umd.js"></script>
+    <script type="text/javascript">
+      //获取provider window.ethereum就是metamask全局变量
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      let signer = '';
+      $(document).on('click', '#wallet', async () => {
+        //弹起钱包
+        // 这个语法不会强行的弹起钱包 用户主动的断开了这个链接的话 失败了~
+        // const accounts = (await this.provider.request({ method: 'eth_accounts' })) as string[]
+        await provider.send('eth_requestAccounts', []);
+        //获得签名
+        signer = provider.getSigner();
+        const address = await signer.getAddress();
+        console.log('address: ', address);
+        let pendingBal = await provider.getBalance(address, 'pending');
+        let balance = ethers.utils.formatEther(pendingBal);
+        console.log('👛: ', balance);
+      });
+    </script>
+  </body>
+</html>
